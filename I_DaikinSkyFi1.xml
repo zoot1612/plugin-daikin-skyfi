@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<implementation>
+  <files>L_DaikinSkyFi1.lua</files>
+  <startup>daikin_sky_startup</startup>
+  <incoming>
+    <lua>processMessage(lul_data, lul_device)</lua>
+  </incoming>
+  <actionList>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:HVAC_UserOperatingMode1</serviceId>
+      <name>SetModeTarget</name>
+      <run>set_mode_target(lul_device, lul_settings.NewModeTarget)</run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:HVAC_FanOperatingMode1</serviceId>
+      <name>SetMode</name>
+      <run>set_fan_mode(lul_device, lul_settings.NewMode)</run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:FanSpeed1</serviceId>
+      <name>SetFanSpeed</name>
+      <run>set_fan_speed(lul_device, lul_settings.NewFanSpeedTarget)</run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1</serviceId>
+      <name>SetCurrentSetpoint</name>
+      <run>set_point(lul_device, lul_settings.NewCurrentSetpoint)</run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:SwitchPower1</serviceId>
+      <name>SetTarget</name>
+      <run>set_target(lul_device, lul_settings.newTargetValue)</run>
+    </action>
+    <action>
+      <serviceId>urn:micasaverde-com:serviceId:HaDevice1</serviceId>
+      <name>ToggleState</name>
+      <run>toggle_output(lul_device, lul_settings.newTargetValue)</run>
+    </action>
+  </actionList>
+</implementation>
+
