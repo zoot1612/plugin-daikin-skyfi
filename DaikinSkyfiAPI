@@ -1,7 +1,7 @@
 Daikin Skyfi API
 
 Base URL: http://IPADDRESS:2000
-
+-----------------------------------------------
 Endpoint: /ac.cgi 
 Parameters: pass
 pass = Device PIN number.
@@ -56,7 +56,13 @@ Example: http://IPADDRESS:2000/set.cgi?pass=XXXXX&p=0&t=24.000000&m=2&f=6&lv=0
 Same as endpoint: /ac.cgi Response: opmode=0&units=.&settemp=24.0&fanspeed=2&fanflags=3&acmode=2&tonact=0&toffact=0&prog=0&time=04:29&day=4&roomtemp=24&outsidetemp=0&louvre=0&zone=254&flt=0&test=0&errdata=145&sensors=1
 -----------------------------------------------
 Endpoint: /setzone.cgi
-Parameters: pass, 
+Parameters: pass, z, s
+z = zone number example zone2
+s = shut (0) or open (1)
+
+http://IPADDRESS:2000/set.cgi?pass=XXXXX&z=zone2&s=0
+
+Same as endpoint: opmode=0&units=.&settemp=24.0&fanspeed=1&fanflags=1&acmode=2&tonact=0&toffact=0&prog=0&time=04:46&day=4&roomtemp=24&outsidetemp=0&louvre=0&zone=238&flt=0&test=0&errdata=145&sensors=1
 -----------------------------------------------
 Endpoint: /identify.cgi
 Parameters: pass
