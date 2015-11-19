@@ -11,7 +11,8 @@ Parameters:pass, p, t, f, m.
 pass = Device PIN number.
 p = Power status (0, 1).
 t = Set point (24.000000) App sends with decimal places.
-f = Fan speed plus Fan status.
+f = Fan Mode.
+m = HVAC Mode.
 
 Endpoint: /setzone.cgi
 Parameters:
