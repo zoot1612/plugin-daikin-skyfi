@@ -10,6 +10,27 @@ Example: http://<IPADDRESS>:2000/ac.cgi?pass=XXXXX
 
 Response: opmode=0&units=.&settemp=16.0&fanspeed=1&fanflags=3&acmode=4&tonact=0&toffact=0&prog=0&time=03:28&day=4&roomtemp=27&outsidetemp=0&louvre=0&zone=254&flt=0&test=0&errdata=145&sensors=1
 
+Some of this is self expanitory others guessed or unknown
+opmode=0      On (1) or Off (0)
+units=.       Unknown
+settemp=16.0  Set point
+fanspeed=1    Low (1) or High (3)
+fanflags=3    Manual (1) or Auto (3)
+acmode=4      Off (0), HeatOn (2), AutoChangeOver (3), Dry (4), CoolOn (8), Fan (16) 
+tonact=0      Time On Active
+toffact=0     Time Off Active
+prog=0        Program
+time=03:28    Time
+day=4         day
+roomtemp=27   Room Temp
+outsidetemp=0 Outside Temp (Assume requires second temp probe)
+louvre=0      louvre (?)
+zone=254      Zone (Zone states Binary 254 = 11111110 counting from MSB zone 1 to LSB zone 8)
+flt=0         Filter (Assume will switch to 1 when filter requires cleaning)
+test=0        Test (?)
+errdata=145   errdata (?)
+sensors=1     sensors (?)
+
 Endpoint: /set.cgi
 Parameters: pass, p, t, f, m.
 pass = Device PIN number.
