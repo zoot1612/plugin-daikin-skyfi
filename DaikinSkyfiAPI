@@ -6,19 +6,23 @@ Endpoint: /ac.cgi
 Parameters: pass
 pass = Device PIN number.
 
+Example: http://<IPADDRESS>:2000/ac.cgi?pass=XXXXX
+
+Response: opmode=0&units=.&settemp=16.0&fanspeed=1&fanflags=3&acmode=4&tonact=0&toffact=0&prog=0&time=03:28&day=4&roomtemp=27&outsidetemp=0&louvre=0&zone=254&flt=0&test=0&errdata=145&sensors=1
+
 Endpoint: /set.cgi
-Parameters:pass, p, t, f, m.
+Parameters: pass, p, t, f, m.
 pass = Device PIN number.
-p = Power status (0, 1).
-t = Set point (24.000000) App sends with decimal places.
+p = Power.
+t = Set point.
 f = Fan Mode.
 m = HVAC Mode.
 
 Endpoint: /setzone.cgi
-Parameters:
+Parameters: pass, 
 
 Endpoint: /identify.cgi
-Parameters:
+Parameters: pass, 
 
 Endpoint: /zones.cgi
-Parameters: 
+Parameters: pass, 
