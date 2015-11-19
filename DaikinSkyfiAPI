@@ -1,12 +1,12 @@
 Daikin Skyfi API
 
-Base URL: http://<ipaddress>:2000
+Base URL: http://IPADDRESS:2000
 
 Endpoint: /ac.cgi 
 Parameters: pass
 pass = Device PIN number.
 
-Example: http://<IPADDRESS>:2000/ac.cgi?pass=XXXXX
+Example: http://IPADDRESS:2000/ac.cgi?pass=XXXXX
 
 Response: opmode=0&units=.&settemp=16.0&fanspeed=1&fanflags=3&acmode=4&tonact=0&toffact=0&prog=0&time=03:28&day=4&roomtemp=27&outsidetemp=0&louvre=0&zone=254&flt=0&test=0&errdata=145&sensors=1
 
@@ -30,20 +30,48 @@ flt=0         Filter (Assume will switch to 1 when filter requires cleaning)
 test=0        Test (?)
 errdata=145   errdata (?)
 sensors=1     sensors (?)
-
+-----------------------------------------------
 Endpoint: /set.cgi
 Parameters: pass, p, t, f, m.
 pass = Device PIN number.
-p = Power.
+p = same as opmode.
 t = Set point.
-f = Fan Mode.
-m = HVAC Mode.
+f = Fan mode, combination of fanspeed and fanflags
+    0 = fanspeed=0&fanflags=1 --Does not stick
+    1 = fanspeed=1&fanflags=1
+    2 = fanspeed=2&fanflags=1 --Does not stick
+    3 = fanspeed=3&fanflags=1
+    4 = fanspeed=0&fanflags=3 --Does not stick
+    5 = fanspeed=1&fanflags=3
+    6 = fanspeed=2&fanflags=3 --Does not stick
+    7 = fanspeed=3&fanflags=3
+    
+      fanflags = tonumber(fanflags) == 3 and 4 or 0
+      f =  fanspeed + fanflags
+    
+m = same as acmode.
 
+Example: http://IPADDRESS:2000/set.cgi?pass=XXXXX&p=0&t=24.000000&m=2&f=6&lv=0
+
+Same as endpoint: /ac.cgi Response: opmode=0&units=.&settemp=24.0&fanspeed=2&fanflags=3&acmode=2&tonact=0&toffact=0&prog=0&time=04:29&day=4&roomtemp=24&outsidetemp=0&louvre=0&zone=254&flt=0&test=0&errdata=145&sensors=1
+-----------------------------------------------
 Endpoint: /setzone.cgi
 Parameters: pass, 
-
+-----------------------------------------------
 Endpoint: /identify.cgi
-Parameters: pass, 
+Parameters: pass
 
+Example: http://IPADDRESS:2000/identify.cgi?pass=XXXXX
+
+Response: identify=DaikinAC&serial=108187719&fw=V0.45e&wl=4.00.1&ver=1&zc=1&lc=0&ls=0&af=0
+-----------------------------------------------
 Endpoint: /zones.cgi
-Parameters: pass, 
+Parameters: pass
+
+Example: http://IPADDRESS:2000/zones.cgi?pass=XXXX
+
+Response: nz=8&zone1=Living1&zone2=Lounge&zone3=Office&zone4=Main%20Bedroom&zone5=Bed3&zone6=Bed2&zone7=Bed1&zone8=Spare
+
+nz = number of zones (guess)
+zone1 - zone8 = zones + zonenames
+-----------------------------------------------
