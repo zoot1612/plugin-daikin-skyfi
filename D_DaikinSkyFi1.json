@@ -1,9 +1,9 @@
 {
     "flashicon": "icons/Thermostat.png",
     "iconText": "1",
-    "imgIconBody": "pics/devices/Thermostat_BODY.png",
+    "imgIconBody": "",
     "imgIconDimmable": "",
-    "imgIconTurnable": "pics/devices/Thermostat_SWITCH.png",
+    "imgIconTurnable": "",
     "imgIconMin": "",
     "imgIconMax": "",
     "halloIconsDir": "pics/hallo",
@@ -38,8 +38,7 @@
         "doc_language": 1,
         "doc_manual": 1,
         "doc_version": 1,
-        "doc_platform": 0,
-        "doc_page": "thermostats"
+        "doc_platform": 0
     },
     "ToggleButton": 1,
     "Tabs": [
@@ -128,35 +127,6 @@
                     }
                 },
                 {
-                    "ControlType": "button",
-                    "top": "0",
-                    "left": "0",
-                    "Label": {
-                        "lang_tag": "cmd_off",
-                        "text": "Off"
-                    },
-                    "Display": {
-                        "Top": 30,
-                        "Left": 30,
-                        "Width": 75,
-                        "Height": 20,
-                        "Service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
-                        "Variable": "ModeStatus",
-                        "Value": "Off"
-                    },
-                    "Command": {
-                        "Service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
-                        "Action": "SetModeTarget",
-                        "Parameters": [
-                            {
-                                "Name": "NewModeTarget",
-                                "Value": "Off"
-                            }
-                        ]
-                    },
-					"ControlCode": "hvac_off"
-                },
-                {
                     "ControlGroup": "1",
                     "ControlType": "button",
                     "top": "0",
@@ -197,7 +167,7 @@
                     },
                     "Display": {
                         "Top": 30,
-                        "Left": 130,
+                        "Left": 115,
                         "Width": 75,
                         "Height": 20,
                         "Service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
@@ -227,7 +197,7 @@
                     },
                     "Display": {
                         "Top": 30,
-                        "Left": 230,
+                        "Left": 200,
                         "Width": 75,
                         "Height": 20,
                         "Service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
@@ -257,7 +227,7 @@
                     },
                     "Display": {
                         "Top": 30,
-                        "Left": 330,
+                        "Left": 285,
                         "Width": 75,
                         "Height": 20,
                         "Service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
@@ -281,17 +251,17 @@
                     "top": "3",
                     "left": "0",
                     "Label": {
-                        "lang_tag": "cmd_fan",
-                        "text": "Fan"
+                        "lang_tag": "cmd_dry",
+                        "text": "Dry"
                     },
                     "Display": {
                         "Top": 30,
-                        "Left": 430,
+                        "Left": 370,
                         "Width": 75,
                         "Height": 20,
                         "Service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
                         "Variable": "ModeStatus",
-                        "Value": "FanOnly"
+                        "Value": "Dry"
                     },
                     "Command": {
                         "Service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
@@ -299,11 +269,40 @@
                         "Parameters": [
                             {
                                 "Name": "NewModeTarget",
-                                "Value": "FanOnly"
+                                "Value": "Dry"
                             }
                         ]
                     },
-                    "ControlCode": "fan_fan"
+                    "ControlCode": "cmd_dry"
+                },
+                {
+                    "ControlType": "button",
+                    "top": "3",
+                    "left": "0",
+                    "Label": {
+                        "lang_tag": "cmd_fan",
+                        "text": "Fan"
+                    },
+                    "Display": {
+                        "Top": 30,
+                        "Left": 455,
+                        "Width": 75,
+                        "Height": 20,
+                        "Service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
+                        "Variable": "ModeStatus",
+                        "Value": "Fan"
+                    },
+                    "Command": {
+                        "Service": "urn:upnp-org:serviceId:HVAC_UserOperatingMode1",
+                        "Action": "SetModeTarget",
+                        "Parameters": [
+                            {
+                                "Name": "NewModeTarget",
+                                "Value": "Fan"
+                            }
+                        ]
+                    },
+                    "ControlCode": "cmd_fan"
                 },
                 {
                     "ControlType": "label",
@@ -361,7 +360,7 @@
                     },
                     "Display": {
                         "Top": 150,
-                        "Left": 130,
+                        "Left": 115,
                         "Width": 75,
                         "Height": 20,
                         "Service": "urn:upnp-org:serviceId:FanSpeed1",
@@ -391,7 +390,7 @@
                     },
                     "Display": {
                         "Top": 150,
-                        "Left": 230,
+                        "Left": 200,
                         "Width": 75,
                         "Height": 20,
                         "Service": "urn:upnp-org:serviceId:FanSpeed1",
@@ -466,7 +465,7 @@
                     },
                     "Display": {
                         "Top": 90,
-                        "Left": 130,
+                        "Left": 115,
                         "Width": 75,
                         "Height": 20,
                         "Service": "urn:upnp-org:serviceId:HVAC_FanOperatingMode1",
