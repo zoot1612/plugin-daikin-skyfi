@@ -1,0 +1,23 @@
+Daiki nSkyfi API
+
+Base URL: http://<ipaddress>:2000
+
+Endpoint: /ac.cgi 
+Parameters: pass
+pass = Device PIN number.
+
+Endpoint: /set.cgi
+Parameters:pass, p, t, f, m.
+pass = Device PIN number.
+p = Power status (0, 1).
+t = Set point (24.000000) App sends with decimal places.
+f = Fan speed plus Fan status.
+
+Endpoint: /setzone.cgi
+Parameters:
+
+Endpoint: /identify.cgi
+Parameters:
+
+Endpoint: /zones.cgi
+Parameters: 
