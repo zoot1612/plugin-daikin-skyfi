@@ -1,11 +1,10 @@
 local http = require("socket.http")
 local ltn12 = require("ltn12")
-local http = require("socket.http")
-http.TIMEOUT = 30
+http.TIMEOUT = 10
 
 local DEBUG_MODE = true
-local RETRY = 20
-local VERSION = "0.110"
+local RETRY = 15
+local VERSION = "0.111"
 
 local skyfi_device = nil
 
@@ -36,16 +35,11 @@ local HAD_COMM_FAILURE = "CommFailure"
 
 local g_modes = {
   ['0'] = "Off",
-  ['1'] = "HeatOn",       
-  ['2'] = "AutoChangeOver",              
+  ['2'] = "HeatOn",              
   ['3'] = "AutoChangeOver",       
-  ['4'] = "FanOnly",
-  ['5'] = "Unknown_5",
-  ['6'] = "Unknown_6",
-  ['7'] = "Unknown_7",
+  ['4'] = "Dry",
   ['8'] = "CoolOn",
-  ['9'] = "AutoChangeOver",             
-  ['16'] = "AutoChangeOver",                  
+  ['16'] = "Fan",                  
 }
 
 
