@@ -1,5 +1,7 @@
 Daikin Skyfi API
 
+Any help with any missing or incorrect information appreciated.
+
 Base URL: http://IPADDRESS:2000
 -----------------------------------------------
 Endpoint: /ac.cgi 
