@@ -1,5 +1,5 @@
 {
-    "flashicon": "icons/Thermostat.png",
+    "flashicon": "icons/Skyfi.png",
     "iconText": "1",
     "imgIconBody": "",
     "imgIconDimmable": "",
@@ -117,7 +117,7 @@
                     "left": "0",
                     "Label": {
                         "lang_tag": "thermostat",
-                        "text": "Thermostat"
+                        "text": "Mode"
                     },
                     "Display": {
                         "Top": 15,
@@ -762,3 +762,4 @@
     "DeviceType": "urn:zoot-com:device:DaikinSkyFi:1",
     "device_type": "urn:zoot-com:device:DaikinSkyFi:1"
 }
+
