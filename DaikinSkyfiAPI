@@ -83,3 +83,5 @@ Response: nz=8&zone1=Living1&zone2=Lounge&zone3=Office&zone4=Main%20Bedroom&zone
 nz = number of zones (guess)
 zone1 - zone8 = zones + zonenames
 -----------------------------------------------
+-----------------------------------------------
+The physical layer for the Daikin communications uses twisted pair based on the Home Bus System (HBS) developed by the Japan Electronic Industries Association / Wireless Engineering Electronics Association HBS Standards Committee.
