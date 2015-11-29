@@ -85,3 +85,4 @@ zone1 - zone8 = zones + zonenames
 -----------------------------------------------
 -----------------------------------------------
 The physical layer for the Daikin communications uses twisted pair based on the Home Bus System (HBS) developed by the Japan Electronic Industries Association / Wireless Engineering Electronics Association HBS Standards Committee.
+With the Mitsumi Electronics, Corp MM1192 IC as driver and receiver.
