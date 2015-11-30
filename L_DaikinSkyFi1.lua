@@ -2,7 +2,7 @@ local http = require("socket.http")
 local ltn12 = require("ltn12")
 http.TIMEOUT = 10
 
-local DEBUG_MODE = true
+local DEBUG_MODE = 1
 local RETRY = 15
 local VERSION = "0.111"
 
@@ -60,7 +60,7 @@ function log (text,level)
 end
 ----------------------------------------------------------------------------------------------
 function debug (text,level)
-  if (DEBUG_MODE == true) then
+  if (DEBUG_MODE == 1) then
     log(text,level or 1)
   end
 end
@@ -68,10 +68,11 @@ end
 local function debug_mode()
   local debug = luup.variable_get(SKYFI_SID, "DebugMode", skyfi_device) or ""
   if (debug == "") then
-    debug = DEBUG_MODE and "1" or "0"
-    luup.variable_set(SKYFI_SID, "DebugMode", debug, skyfi_device)
+    luup.variable_set(SKYFI_SID, "DebugMode", DEBUG_MODE, skyfi_device)
+  else
+    DEBUG_MODE = tonumber(debug)
   end
-  log("Debug mode: "..(DEBUG_MODE and "enabled" or "disabled")..".")
+  log("Debug mode: "..(DEBUG_MODE == 1 and "enabled" or "disabled")..".")
 end
 ----------------------------------------------------------------------------------------------
 local function hex_2_bin(s)
