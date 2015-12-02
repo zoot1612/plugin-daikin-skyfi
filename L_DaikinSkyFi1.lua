@@ -39,7 +39,7 @@ local g_modes = {
   ['3'] = "AutoChangeOver",       
   ['4'] = "Dry",
   ['8'] = "CoolOn",
-  ['9'] = "Unknown",  
+  ['9'] = "Unknown",  --Possible reached or exceeded set point
   ['16'] = "Fan",                  
 }
 
