@@ -1,7 +1,10 @@
 Daikin Skyfi API
 
 Any help with any missing or incorrect information appreciated.
-
+-----------------------------------------------
+Modes
+Off (0), HeatOn (2), AutoChangeOver (3), Dry (4), CoolOn (8), ? (9), Fan (16) 
+-----------------------------------------------
 Base URL: http://IPADDRESS:2000
 -----------------------------------------------
 Endpoint: /ac.cgi 
