@@ -9,6 +9,7 @@
     <staticJson>D_DaikinSkyFi1.json</staticJson>
     <friendlyName>Daikin SKYFi</friendlyName>
     <manufacturer>Daikin</manufacturer>
+    <Category_Num>5</Category_Num>
     <handleChildren>1</handleChildren>
     <serviceList>
       <service>
