@@ -198,10 +198,10 @@ local function zone_create(params)
       local zone_name = "DaikinAC_" .. name
       local hvac = "hvac_".. zone
       if isUI7 == "true" then
-        debug("Creating child " .. hvac .. "(" .. zone_name .. ")")
+        debug("Creating child " .. hvac .. "(" .. zone_name .. ") as " .. DEVICETYPE_ZONE_UI7)
         luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE_UI7,DEVICEFILE_ZONE_UI7,"","",false)
       else
-        debug("Creating child " .. hvac .. " (" .. zone_name .. ")")
+        debug("Creating child " .. hvac .. " (" .. zone_name .. ") as " .. DEVICETYPE_ZONE)
         luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE,DEVICEFILE_ZONE,"","",false)
       end
     end
