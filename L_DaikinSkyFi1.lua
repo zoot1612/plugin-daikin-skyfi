@@ -185,11 +185,11 @@ end
 local function zone_create(params)
   if(params == "" or params == nil) then return false end
   child_device = luup.chdev.start(skyfi_device);
-  local isUI7 = luup.variable_get(ServiceId, "UI7Check", lug_device) or ""
-	if isUI7 == "" then
-		luup.variable_set(ServiceId, "UI7Check", "false", lug_device)
-		isUI7 = "false"
-	end
+  local isUI7 = luup.variable_get(ServiceId, "UI7Check", skyfi_device) or ""
+    if isUI7 == "" then
+      luup.variable_set(ServiceId, "UI7Check", "false", skyfi_device)
+      isUI7 = "false"
+    end
   for pair in params:gmatch"[^&]+" do
     local zone, name = pair:match"([^=]*)=(.*)"
     zone = decode(zone)
