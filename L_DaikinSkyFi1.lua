@@ -13,6 +13,8 @@ local DEFAULT_SETPOINT = 24
 local DEFAULT_POLL = "1m"
 local DEVICETYPE_ZONE = "urn:zoot-com:device:Damper:1"
 local DEVICEFILE_ZONE = "D_Damper1.xml"
+local DEVICETYPE_ZONE_UI7 = "urn:schemas-upnp-org:device:BinaryLight:1"
+local DEVICEFILE_ZONE_UI7 = "D_BinaryLight1.xml"
 
 local SWP_SID = "urn:upnp-org:serviceId:SwitchPower1"
 local SWP_STATUS = "Status"
@@ -195,15 +197,13 @@ local function zone_create(params)
     if(zone:match("^zone(%d+)")) then
       local zone_name = "DaikinAC_" .. name
       local hvac = "hvac_".. zone
-      
       if isUI7 == "true" then
-				debug("Creating child " .. childUSN .. " (" .. childName .. ") as " .. childType, 2)
-				luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE,DEVICEFILE_ZONE,"","",false)
-			else
-				debug("Creating child " .. childUSN .. " (" .. childName .. ") as " .. childType, 2)
-				luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE,DEVICEFILE_ZONE,"","",false)
-			end
-      debug("zone_create:" .. zone_name)
+        debug("Creating child " .. hvac .. " (" .. zone_name .. "))
+        luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE_UI7,DEVICEFILE_ZONE_UI7,"","",false)
+      else
+        debug("Creating child " .. hvac .. " (" .. zone_name .. "))
+        luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE,DEVICEFILE_ZONE,"","",false)
+      end
     end
   end
 
