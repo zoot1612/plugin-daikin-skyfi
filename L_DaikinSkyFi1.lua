@@ -78,6 +78,19 @@ local function debug_mode()
   log("Debug mode: "..(DEBUG_MODE == 1 and "enabled" or "disabled")..".")
 end
 ----------------------------------------------------------------------------------------------
+local function checkVersion()
+	local ui7Check = luup.variable_get(SKYFI_SID, "UI7Check", skyfi_device) or ""
+	if ui7Check == "" then
+		luup.variable_set(ServiceId, "UI7Check", "false", skyfi_device)
+		ui7Check = "false"
+	end
+	if( luup.version_branch == 1 and luup.version_major == 7 and ui7Check == "false") then
+		luup.variable_set(SKYFI_SID, "UI7Check", "true", skyfi_device)
+		--luup.attr_set("device_json", " ", lug_device)
+		luup.reload()
+	end
+end
+----------------------------------------------------------------------------------------------
 local function hex_2_bin(s)
   local h2b_table = {
     ["0"] = "0000",
@@ -766,7 +779,7 @@ end
 function daikin_sky_startup(lul_device)
   log(":Daikin SkyFi Plugin version " .. VERSION .. ".")
   luup.variable_set(SKYFI_SID, "PluginVersion", VERSION, lul_device)
-
+  checkVersion() 
   debug_mode()
   command_retry()
 
