@@ -183,6 +183,11 @@ end
 local function zone_create(params)
   if(params == "" or params == nil) then return false end
   child_device = luup.chdev.start(skyfi_device);
+  local isUI7 = luup.variable_get(ServiceId, "UI7Check", lug_device) or ""
+	if isUI7 == "" then
+		luup.variable_set(ServiceId, "UI7Check", "false", lug_device)
+		isUI7 = "false"
+	end
   for pair in params:gmatch"[^&]+" do
     local zone, name = pair:match"([^=]*)=(.*)"
     zone = decode(zone)
@@ -190,7 +195,14 @@ local function zone_create(params)
     if(zone:match("^zone(%d+)")) then
       local zone_name = "DaikinAC_" .. name
       local hvac = "hvac_".. zone
-      luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE,DEVICEFILE_ZONE,"","",false)
+      
+      if isUI7 == "true" then
+				debug("Creating child " .. childUSN .. " (" .. childName .. ") as " .. childType, 2)
+				luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE,DEVICEFILE_ZONE,"","",false)
+			else
+				debug("Creating child " .. childUSN .. " (" .. childName .. ") as " .. childType, 2)
+				luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE,DEVICEFILE_ZONE,"","",false)
+			end
       debug("zone_create:" .. zone_name)
     end
   end
