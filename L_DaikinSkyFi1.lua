@@ -4,7 +4,7 @@ http.TIMEOUT = 10
 
 local DEBUG_MODE = 1
 local RETRY = 15
-local VERSION = "0.114"
+local VERSION = "0.115"
 
 local skyfi_device = nil
 
@@ -41,7 +41,7 @@ local g_modes = {
   ['3'] = "AutoChangeOver",       
   ['4'] = "Dry",
   ['8'] = "CoolOn",
-  ['9'] = "Unknown",  --Possible reached or exceeded set point
+  ['9'] = "AutoChangeOver",  --Possible reached or exceeded set point
   ['16'] = "Fan",                  
 }
 
