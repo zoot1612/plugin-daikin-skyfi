@@ -36,15 +36,14 @@ local HAD_LAST_UPDATE = "LastUpdate"
 local HAD_COMM_FAILURE = "CommFailure"
 
 local g_modes = {
-  ['0'] = "Off",
-  ['2'] = "HeatOn",              
-  ['3'] = "AutoChangeOver",       
-  ['4'] = "Dry",
-  ['8'] = "CoolOn",
-  ['9'] = "AutoChangeOver",  --Possible reached or exceeded set point
-  ['16'] = "Fan",                  
+  ['0'] = "Off",		--0000 0000 =  0 = Off
+  ['2'] = "HeatOn",		--0000 0010 =  2 = HeatOn
+  ['3'] = "AutoChangeOver",     --0000 0011 =  3 = Autochangeover on, HeatOn
+  ['4'] = "Dry",		--0000 0100 =  4 = Dry 
+  ['8'] = "CoolOn",		--0000 1000 =  8 = CoolOn
+  ['9'] = "AutoChangeOver",	--0000 1001 =  9 = Autochangeover on, CoolOn
+  ['16'] = "Fan"		--0001 0000 = 16 = Fan                  
 }
-
 
 local g_config = {}
 local g_param = {}
