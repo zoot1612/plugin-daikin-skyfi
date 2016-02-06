@@ -4,7 +4,7 @@ http.TIMEOUT = 10
 
 local DEBUG_MODE = 1
 local RETRY = 15
-local VERSION = "0.115"
+local VERSION = "0.116"
 
 local skyfi_device = nil
 
