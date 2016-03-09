@@ -4,7 +4,7 @@ http.TIMEOUT = 10
 
 local DEBUG_MODE = 1
 local RETRY = 15
-local VERSION = "0.116"
+local VERSION = "0.117"
 
 local skyfi_device = nil
 
@@ -45,6 +45,7 @@ local g_modes = {
   ['16'] = "Fan"		--0001 0000 = 16 = Fan                  
 }
 
+local g_queue = {}
 local g_config = {}
 local g_param = {}
 local g_settings = {}
@@ -691,6 +692,49 @@ function get_zones()
   end
 end
 ----------------------------------------------------------------------------------------------
+function schedule()
+  local delay = 300
+  for i = 1, #g_queue do
+    if (g_queue[i].time <= os.time()) then
+      delay = 1
+      break
+    end
+    delay = math.min(delay, g_queue[i].time - os.time())
+  end
+  
+  debug("Sleeping for " .. delay .. " seconds")
+  luup.call_delay("reentry", delay, "")
+end
+----------------------------------------------------------------------------------------------
+function reentry()
+  local action = nil
+  for i = 1, #g_queue do
+    if (g_queue[i].time <= os.time()) then
+      action = table.remove(g_queue, i)
+      break
+    end
+  end
+
+  if (action) then
+    local result = action.action()
+    if (result == nil) then
+      if (action.retries > 0) then
+        queue_command(math.random(1, 5), action.retries - 1, action.action)
+      end
+    end
+  end
+  schedule()
+end
+----------------------------------------------------------------------------------------------
+function queue_command(delay, retries, action)
+  debug("Command queued.")
+  table.insert(g_queue, {
+    time = os.time() + delay,
+    retries = retries,
+    action = action
+  })
+end
+----------------------------------------------------------------------------------------------
 function configure()
   debug("Configuring plugin ...")
 
@@ -812,6 +856,7 @@ function daikin_sky_startup(lul_device)
     luup.set_failure(false, skyfi_device)
     luup.call_delay("configure", 10, "")
     luup.call_delay("ac_update", 30, "")
+    schedule()
   else
     return false, "Startup un-successful.", "Daikin SkyFi"
   end
