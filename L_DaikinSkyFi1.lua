@@ -4,9 +4,10 @@ http.TIMEOUT = 10
 
 local DEBUG_MODE = 1
 local RETRY = 15
-local VERSION = "0.116"
+local VERSION = "0.117"
 
 local skyfi_device = nil
+local g_delay = 300
 
 local SKYFI_SID  = "urn:zoot-org:serviceId:SkyFi1"
 local DEFAULT_SETPOINT = 24
@@ -693,6 +694,7 @@ function get_zones()
 end
 ----------------------------------------------------------------------------------------------
 function schedule()
+  local delay = luup.variable_get(SKYFI_SID, "Delay", skyfi_device) or g_delay
   for i = 1, #g_queue do
     if (g_queue[i].time <= os.time()) then
       delay = 1
@@ -818,10 +820,18 @@ end
 function daikin_sky_startup(lul_device)
   log(":Daikin SkyFi Plugin version " .. VERSION .. ".")
   luup.variable_set(SKYFI_SID, "PluginVersion", VERSION, lul_device)
+  
   checkVersion() 
+  
   debug_mode()
+  
   command_retry()
-
+  
+  local delay = luup.variable_get(SKYFI_SID, "Delay", skyfi_device) or ""
+  if (delay == "") then
+    luup.variable_set(SKYFI_SID, "Delay", g_delay, skyfi_device)
+  end
+  
   local config_state = luup.variable_get(HADEVICE_SID,"Configured", skyfi_device) or ""
   if (config_state == "") then
     luup.variable_set(HADEVICE_SID,"Configured","0", skyfi_device)
@@ -850,9 +860,9 @@ function daikin_sky_startup(lul_device)
   if(ip_address) then
     --luup.variable_set(HADEVICE_SID,"CommFailure","0", skyfi_device)
     luup.set_failure(false, skyfi_device)
+    queue_action(5, 5, function() return configure() end)
+    queue_action(10, 5, function() return ac_update() end)
     schedule()
-    queueAction(5, 3, function() return configure() end)
-    queueAction(10, 3, function() return ac_update() end)    
   else
     return false, "Startup un-successful.", "Daikin SkyFi"
   end
