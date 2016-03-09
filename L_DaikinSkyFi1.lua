@@ -49,6 +49,7 @@ local g_config = {}
 local g_param = {}
 local g_settings = {}
 local g_fan = {fanflags = 0, fanspeed = 0}
+local g_queue = {}
 
 ----------------------------------------------------------------------------------------------
 local function decode(s)
@@ -691,6 +692,45 @@ function get_zones()
   end
 end
 ----------------------------------------------------------------------------------------------
+function schedule()
+  for i = 1, #g_queue do
+    if (g_queue[i].time <= os.time()) then
+      delay = 1
+      break
+    end
+    delay = math.min(delay, g_queue[i].time - os.time())
+  end
+  debug("Sleeping for " .. delay .. " seconds", 2)
+  luup.call_delay("reentry", delay, "")
+end
+----------------------------------------------------------------------------------------------
+function reentry()
+  local action = nil
+  for i = 1, #g_queue do
+    if (g_queue[i].time <= os.time()) then
+      action = table.remove(g_queue, i)
+      break
+    end
+  end
+
+-- Clock skew might mean there is no action.
+  if (action) then
+    local result = action.action()
+    if (result == nil) then
+      if (action.retries > 0) then
+        queue_action(math.random(1, 5), action.retries - 1, action.action)
+      end
+    end
+  end
+  -- Go back to sleep.
+  schedule()
+end
+----------------------------------------------------------------------------------------------
+function queue_action(delay, retries, action)
+  debug("Action queued.", 2)
+  table.insert(g_queue, {time = os.time() + delay,retries = retries,action = action})
+end
+----------------------------------------------------------------------------------------------
 function configure()
   debug("Configuring plugin ...")
 
@@ -810,8 +850,9 @@ function daikin_sky_startup(lul_device)
   if(ip_address) then
     --luup.variable_set(HADEVICE_SID,"CommFailure","0", skyfi_device)
     luup.set_failure(false, skyfi_device)
-    luup.call_delay("configure", 10, "")
-    luup.call_delay("ac_update", 30, "")
+    schedule()
+    queueAction(5, 3, function() return configure() end)
+    queueAction(10, 3, function() return ac_update() end)    
   else
     return false, "Startup un-successful.", "Daikin SkyFi"
   end
