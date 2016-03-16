@@ -788,7 +788,7 @@ function daikin_sky_startup(lul_device)
   if (ip == "") then
     local ip_address, port = auto_config()
     if(ip_address) then
-      luup.attr_set('ip', ip , skyfi_device)
+      luup.attr_set('ip', ip_address , skyfi_device)
     else
       return false, "Cannot auto configure, please try entering IP address and port.", "Daikin SKYFi"
     end
