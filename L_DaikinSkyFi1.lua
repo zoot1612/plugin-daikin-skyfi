@@ -4,7 +4,7 @@ http.TIMEOUT = 10
 
 local DEBUG_MODE = 1
 local RETRY = 15
-local VERSION = "0.117"
+local VERSION = "0.118"
 
 local skyfi_device = nil
 
@@ -13,8 +13,6 @@ local DEFAULT_SETPOINT = 24
 local DEFAULT_POLL = "1m"
 local DEVICETYPE_ZONE = "urn:zoot-com:device:Damper:1"
 local DEVICEFILE_ZONE = "D_Damper1.xml"
-local DEVICETYPE_ZONE_UI7 = "urn:schemas-upnp-org:device:BinaryLight:1"
-local DEVICEFILE_ZONE_UI7 = "D_BinaryLight1.xml"
 
 local SWP_SID = "urn:upnp-org:serviceId:SwitchPower1"
 local SWP_STATUS = "Status"
@@ -79,16 +77,15 @@ local function debug_mode()
 end
 ----------------------------------------------------------------------------------------------
 local function checkVersion()
-	local ui7Check = luup.variable_get(SKYFI_SID, "UI7Check", skyfi_device) or ""
-	if ui7Check == "" then
-		luup.variable_set(ServiceId, "UI7Check", "false", skyfi_device)
-		ui7Check = "false"
-	end
-	if( luup.version_branch == 1 and luup.version_major == 7 and ui7Check == "false") then
-		luup.variable_set(SKYFI_SID, "UI7Check", "true", skyfi_device)
-		--luup.attr_set("device_json", " ", lug_device)
-		luup.reload()
-	end
+  local ui7Check = luup.variable_get(SKYFI_SID, "UI7Check", skyfi_device) or ""
+  if ui7Check == "" then
+    luup.variable_set(ServiceId, "UI7Check", "false", skyfi_device)
+    ui7Check = "false"
+  end
+  if( luup.version_branch == 1 and luup.version_major == 7 and ui7Check == "false") then
+    luup.variable_set(SKYFI_SID, "UI7Check", "true", skyfi_device)
+    luup.reload()
+  end
 end
 ----------------------------------------------------------------------------------------------
 local function hex_2_bin(s)
@@ -198,11 +195,6 @@ end
 local function zone_create(params)
   if(params == "" or params == nil) then return false end
   child_device = luup.chdev.start(skyfi_device);
-  local isUI7 = luup.variable_get(SKYFI_SID, "UI7Check", skyfi_device) or ""
-    if isUI7 == "" then
-      luup.variable_set(SKYFI_SID, "UI7Check", "false", skyfi_device)
-      isUI7 = "false"
-    end
   for pair in params:gmatch"[^&]+" do
     local zone, name = pair:match"([^=]*)=(.*)"
     zone = decode(zone)
@@ -210,13 +202,8 @@ local function zone_create(params)
     if(zone:match("^zone(%d+)")) then
       local zone_name = "DaikinAC_" .. name
       local hvac = "hvac_".. zone
-      if isUI7 == "true" then
-        debug("Creating child " .. hvac .. "(" .. zone_name .. ") as " .. DEVICETYPE_ZONE_UI7)
-        luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE_UI7,DEVICEFILE_ZONE_UI7,"","",false)
-      else
-        debug("Creating child " .. hvac .. " (" .. zone_name .. ") as " .. DEVICETYPE_ZONE)
-        luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE,DEVICEFILE_ZONE,"","",false)
-      end
+      debug("Creating child " .. hvac .. " (" .. zone_name .. ") as " .. DEVICETYPE_ZONE)
+      luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE,DEVICEFILE_ZONE,"","",false)
     end
   end
 
@@ -607,7 +594,6 @@ function ac_update()
   if (config_state ~= "1") then
     return configure()
   else
-    --local response = http_request({endpoint="/ac.cgi", params = g_config, resp_match = "opmode"})
     local response = http_request({endpoint="/ac.cgi", resp_match = "opmode"})
     return parse_body(response, g_status)
   end
@@ -692,56 +678,12 @@ function get_zones()
   end
 end
 ----------------------------------------------------------------------------------------------
-function schedule()
-  local delay = 300
-  for i = 1, #g_queue do
-    if (g_queue[i].time <= os.time()) then
-      delay = 1
-      break
-    end
-    delay = math.min(delay, g_queue[i].time - os.time())
-  end
-  
-  debug("Sleeping for " .. delay .. " seconds")
-  luup.call_delay("reentry", delay, "")
-end
-----------------------------------------------------------------------------------------------
-function reentry()
-  local action = nil
-  for i = 1, #g_queue do
-    if (g_queue[i].time <= os.time()) then
-      action = table.remove(g_queue, i)
-      break
-    end
-  end
-
-  if (action) then
-    local result = action.action()
-    if (result == nil) then
-      if (action.retries > 0) then
-        queue_command(math.random(1, 5), action.retries - 1, action.action)
-      end
-    end
-  end
-  schedule()
-end
-----------------------------------------------------------------------------------------------
-function queue_command(delay, retries, action)
-  debug("Command queued.")
-  table.insert(g_queue, {
-    time = os.time() + delay,
-    retries = retries,
-    action = action
-  })
-end
-----------------------------------------------------------------------------------------------
 function configure()
-  debug("Configuring plugin ...")
+  log("Configuring plugin ...")
 
   local status = luup.variable_get(SWP_SID, SWP_STATUS, skyfi_device) or ""
   if status == "" then
     luup.variable_set(SWP_SID, SWP_STATUS, 0, skyfi_device)
-    --luup.variable_set(HVACF_SID, FAN_STATUS, 0, skyfi_device)
   end
   configuration_update(2,{p=status})
 
@@ -820,10 +762,14 @@ function configure()
 end
 ----------------------------------------------------------------------------------------------
 function daikin_sky_startup(lul_device)
+  skyfi_device = lul_device
   log(":Daikin SkyFi Plugin version " .. VERSION .. ".")
-  luup.variable_set(SKYFI_SID, "PluginVersion", VERSION, lul_device)
-  checkVersion() 
+  luup.variable_set(SKYFI_SID, "PluginVersion", VERSION, skyfi_device)
+  
+  checkVersion()
+  
   debug_mode()
+  
   command_retry()
 
   local config_state = luup.variable_get(HADEVICE_SID,"Configured", skyfi_device) or ""
@@ -832,35 +778,27 @@ function daikin_sky_startup(lul_device)
   end
 
   log(":Starting SKYFi Plugin version " .. VERSION .. ".")
-  skyfi_device = lul_device
   
   if (device_code() == false) then
     return false, "No Device Code, please enter device code", "Daikin SKYFi"
   end
   
-  local ip_address, port = auto_config()
   local ip = luup.attr_get('ip', skyfi_device) or ""
   
   if (ip == "") then
-    ip = ip_address
-    if(ip) then
+    local ip_address, port = auto_config()
+    if(ip_address) then
       luup.attr_set('ip', ip , skyfi_device)
     else
       return false, "Cannot auto configure, please try entering IP address and port.", "Daikin SKYFi"
     end
-  end
-    
-      
-  if(ip_address) then
-    --luup.variable_set(HADEVICE_SID,"CommFailure","0", skyfi_device)
+  else
     luup.set_failure(false, skyfi_device)
     luup.call_delay("configure", 10, "")
     luup.call_delay("ac_update", 30, "")
-    schedule()
-  else
-    return false, "Startup un-successful.", "Daikin SkyFi"
   end
-  debug("SkyFi Plugin Startup SUCCESS: Startup successful.")
+
+  log("SkyFi Plugin Startup SUCCESS: Startup successful.")
   return true, "Startup successful.", "Daikin SkyFi"
 end
 
