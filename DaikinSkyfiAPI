@@ -2,31 +2,9 @@ Daikin Skyfi API
 
 Any help with any missing or incorrect information appreciated.
 -----------------------------------------------
-Modes
-Off (0), HeatOn (2), AutoChangeOver (3), Dry (4), CoolOn (8), AutoChangeOver (9), Fan (16) 
+From post http://forum.micasaverde.com/index.php/topic,34854.msg268492.html#msg268492 (cybrmage)
 
-From post 0000 0000 =  0 = Off (0),
-0000 0010 =  2 = HeatOn (2),
-0000 0011 =  3 = AutoChangeOver (3),
-0000 0100 =  4 = Dry (4),
-0000 1000 =  8 = CoolOn (8),
-0000 1001 =  9 = unknown (9),
-0001 0000 = 16 = Fan (16)
-
-It may be that bit zero is the autochangeover flag... If the bit is set the unit is in autochangeover mode, and the remaining bits indicate the mode that the unit is currently operating in...
-
-which would make the modes:
-0000 0000 =  1 = AutoChangeOver Active,
-0000 0010 =  2 = HeatOn,
-0000 0100 =  4 = Dry,
-0000 1000 =  8 = CoolOn (8),
-0001 0000 = 16 = Fan (16)
-
-Which would make a value:
-0 = Autochangeover off, no modes active = Off
-3 = Autochangeover on, HeatOn
-9 = Autochangeover on, CoolOn
-etc...
+It appears that the mode may be a bitmap... The raw info from the linked GitHub page shows...
 0000 0000 =  0 = Off (0),
 0000 0010 =  2 = HeatOn (2),
 0000 0011 =  3 = AutoChangeOver (3),
@@ -49,6 +27,7 @@ Which would make a value:
 3 = Autochangeover on, HeatOn
 9 = Autochangeover on, CoolOn
 etc...
+
 -----------------------------------------------
 Base URL: http://IPADDRESS:2000
 -----------------------------------------------
