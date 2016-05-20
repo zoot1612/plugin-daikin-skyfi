@@ -4,7 +4,7 @@ http.TIMEOUT = 10
 
 local DEBUG_MODE = 1
 local RETRY = 15
-local VERSION = "0.118"
+local VERSION = "0.119"
 
 local skyfi_device = nil
 
@@ -183,7 +183,7 @@ local function auto_config()
   
   if(response) then
     response = (response:sub(33))
-    debug("auto_config: Response " .. response)
+    debug("auto_config:Response: " .. response)
     if(response:match("^wifly")) then
       luup.attr_set('model', response:match'(.+),', skyfi_device)
       return ip, port
@@ -787,6 +787,7 @@ function daikin_sky_startup(lul_device)
   
   if (ip == "") then
     local ip_address, port = auto_config()
+    debug("daikin_sky_startup:IPAddress: " .. ip_address .. ":Port: " .. port ".")
     if(ip_address) then
       luup.attr_set('ip', ip_address , skyfi_device)
     else
