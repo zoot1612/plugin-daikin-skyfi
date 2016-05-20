@@ -787,7 +787,7 @@ function daikin_sky_startup(lul_device)
   
   if (ip == "") then
     local ip_address, port = auto_config()
-    debug("daikin_sky_startup:IPAddress: " .. ip_address .. ":Port: " .. port ".")
+    debug("daikin_sky_startup:IPAddress: " .. ip_address .. ":Port: " .. port .. ".")
     if(ip_address) then
       luup.attr_set('ip', ip_address , skyfi_device)
     else
