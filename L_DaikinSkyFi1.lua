@@ -5,7 +5,7 @@ http.TIMEOUT = 10
 
 local DEBUG_MODE = 1
 local RETRY = 15
-local VERSION = "0.15"
+local VERSION = "0.16"
 
 local skyfi_device = nil
 
@@ -550,17 +550,18 @@ local g_status = {
       local etable = d_err[(value or nil)] 
       local err_desc
       local err_cat
-      local d_error		
       if (etable and etable) then
-        d_error = ("Alarm catagory: " .. d_err_cat[etable.cat] or 'no catagory' .. ". Description:" .. etable.desc .. ".")
-        debug(self.description .. ": " .. d_error)
+        err_desc = etable.desc
+        err_cat = etable.cat or 'no catagory'
+        debug(self.description .. ": " .. "Alarm catagory: " .. err_cat  .. ". Description:" .. etable.desc .. ".")
       elseif (value == '0') then
         debug(self.description .. ": " .. "No air conditioning alarms")
       else
         debug(self.description .. ": " .. "Error code not listed, contact your nearest Daikin technical support service.")
       end
       luup.variable_set(SKYFI_SID,  "ErrorData", value, skyfi_device)
-      luup.variable_set(SKYFI_SID,  "Error", d_error, skyfi_device)
+      luup.variable_set(SKYFI_SID,  "Error", err_cat, skyfi_device)
+      luup.variable_set(SKYFI_SID,  "ErrorDescription", err_desc, skyfi_device)
       return true
     end
   },
