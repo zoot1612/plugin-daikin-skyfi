@@ -547,7 +547,11 @@ local g_status = {
     handler_func = function (self, value)
       debug(self.description .. ": " .. value)
       g_param["errdata"] =  value
+      local err = d_err[value]
+      --local catagory = error and d_err_cat[error.cat] or 0 
+      --"Error code not listed, contact your nearest Daikin technical support service."
       luup.variable_set(SKYFI_SID,  "ErrorData", value, skyfi_device)
+      luup.variable_set(SKYFI_SID,  "Error", err, skyfi_device)
       return true
     end
   },
