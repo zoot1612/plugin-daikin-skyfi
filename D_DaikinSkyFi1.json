@@ -117,7 +117,7 @@
                     "left": "0",
                     "Label": {
                         "lang_tag": "thermostat",
-                        "text": "Mode"
+                        "text": "Thermostat"
                     },
                     "Display": {
                         "Top": 15,

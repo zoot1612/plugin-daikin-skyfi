@@ -1,10 +1,11 @@
+local socket = require("socket")
 local http = require("socket.http")
 local ltn12 = require("ltn12")
 http.TIMEOUT = 10
 
 local DEBUG_MODE = 1
-local RETRY = 10
-local VERSION = "0.138"
+local RETRY = 15
+local VERSION = "0.14"
 
 local skyfi_device = nil
 
@@ -34,13 +35,13 @@ local HAD_LAST_UPDATE = "LastUpdate"
 local HAD_COMM_FAILURE = "CommFailure"
 
 local g_modes = {
-  ['0'] = "Off",		            --0000 0000 =  0 = Off
-  ['2'] = "HeatOn",		          --0000 0010 =  2 = HeatOn
+  ['0'] = "Off",		--0000 0000 =  0 = Off
+  ['2'] = "HeatOn",		--0000 0010 =  2 = HeatOn
   ['3'] = "AutoChangeOver",     --0000 0011 =  3 = Autochangeover on, HeatOn
-  ['4'] = "Dry",		            --0000 0100 =  4 = Dry 
-  ['8'] = "CoolOn",		          --0000 1000 =  8 = CoolOn
-  ['9'] = "AutoChangeOver",	    --0000 1001 =  9 = Autochangeover on, CoolOn
-  ['16'] = "Fan"		            --0001 0000 = 16 = Fan                  
+  ['4'] = "Dry",		--0000 0100 =  4 = Dry 
+  ['8'] = "CoolOn",		--0000 1000 =  8 = CoolOn
+  ['9'] = "AutoChangeOver",	--0000 1001 =  9 = Autochangeover on, CoolOn
+  ['16'] = "Fan"		--0001 0000 = 16 = Fan                  
 }
 
 local g_queue = {}
@@ -79,13 +80,47 @@ end
 local function checkVersion()
   local ui7Check = luup.variable_get(SKYFI_SID, "UI7Check", skyfi_device) or ""
   if ui7Check == "" then
-    luup.variable_set(ServiceId, "UI7Check", "false", skyfi_device)
+    luup.variable_set(SKYFI_SID, "UI7Check", "false", skyfi_device)
     ui7Check = "false"
   end
   if( luup.version_branch == 1 and luup.version_major == 7 and ui7Check == "false") then
     luup.variable_set(SKYFI_SID, "UI7Check", "true", skyfi_device)
+    luup.attr_set("device_json", "D_DaikinSkyFi1_UI7.json", skyfi_device)
     luup.reload()
   end
+end
+----------------------------------------------------------------------------------------------
+function registerWithAltUI()
+   -- Register with ALTUI once it is ready
+   for k, v in pairs(luup.devices) do
+      if (v.device_type == "urn:schemas-upnp-org:device:altui:1") then
+         if luup.is_ready(k) then
+                 luup.log("Found ALTUI device "..k.." registering devices.")
+            local arguments_main = {}
+            arguments_main["newDeviceType"] = "urn:zoot-com:device:DaikinSkyFi:1"   
+            arguments_main["newScriptFile"] = "J_ALTUI_daikin.js"
+            arguments_main["newDeviceDrawFunc"] = "ALTUI_PluginDaikin.drawZoneThermostat"   
+            arguments_main["newStyleFunc"] = ""   
+            arguments_main["newDeviceIconFunc"] = ""   
+            arguments_main["newControlPanelFunc"] = ""   
+						luup.call_action("urn:upnp-org:serviceId:altui1", "RegisterPlugin", arguments_main, k)  
+
+						local arguments_zone = {}
+            arguments_zone["newDeviceType"] = "urn:zoot-com:device:Damper:1"
+   					arguments_zone["newScriptFile"] = "J_ALTUI_plugins.js" 
+            arguments_zone["newDeviceDrawFunc"] = "ALTUI_PluginDisplays.drawBinaryLight"   
+            arguments_zone["newStyleFunc"] = "ALTUI_PluginDisplays.getStyle"
+            arguments_zone["newDeviceIconFunc"] = ""   
+            arguments_zone["newControlPanelFunc"] = ""   
+						luup.call_action("urn:upnp-org:serviceId:altui1", "RegisterPlugin", arguments_zone, k)   
+
+         else
+            luup.log("ALTUI plugin is not yet ready, retry in a bit..")
+            luup.call_delay("registerWithAltUI", 10, "", false)
+         end
+         break
+      end
+   end
 end
 ----------------------------------------------------------------------------------------------
 local function hex_2_bin(s)
@@ -183,7 +218,7 @@ local function auto_config()
   
   if(response) then
     response = (response:sub(33))
-    debug("auto_config:Response: " .. response)
+    debug("auto_config: Response " .. response)
     if(response:match("^wifly")) then
       luup.attr_set('model', response:match'(.+),', skyfi_device)
       return ip, port
@@ -193,6 +228,7 @@ local function auto_config()
 end
 ----------------------------------------------------------------------------------------------
 local function zone_create(params)
+  local ui7Check = luup.variable_get(SKYFI_SID, "UI7Check", skyfi_device)
   if(params == "" or params == nil) then return false end
   child_device = luup.chdev.start(skyfi_device);
   for pair in params:gmatch"[^&]+" do
@@ -203,7 +239,7 @@ local function zone_create(params)
       local zone_name = "DaikinAC_" .. name
       local hvac = "hvac_".. zone
       debug("Creating child " .. hvac .. " (" .. zone_name .. ") as " .. DEVICETYPE_ZONE)
-      luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE,DEVICEFILE_ZONE,"","",false)
+			luup.chdev.append(skyfi_device,child_device,hvac,zone_name,DEVICETYPE_ZONE,DEVICEFILE_ZONE,"","",false)
     end
   end
 
@@ -211,9 +247,12 @@ local function zone_create(params)
   for k, v in pairs(luup.devices) do
     if (tostring(v.device_num_parent) == tostring(skyfi_device)) then
       luup.attr_set("category_num", "5", k)
+      if ui7Check == "true" then
+	      luup.attr_set("device_json", "D_Damper1_UI7.json", k)
+	      debug("Setting damper " .. k .. " with static json file for UI7.")
+      end
     end
   end
-  
   return true
 end
 ----------------------------------------------------------------------------------------------
@@ -554,6 +593,7 @@ function http_request(args, retry)
     end
   
     debug("http_request: request: " .. url)
+    socket.sleep(5)
     client, code, headers, status = http.request {
       url=url, 
       sink=ltn12.sink.table(resp),
@@ -577,7 +617,6 @@ function http_request(args, retry)
     debug("http_request: Number of command retries exceeded")
     return false
   else
-    socket.sleep(5)
     http_request(args, retry)
   end
 end
@@ -595,7 +634,6 @@ function ac_update()
   if (config_state ~= "1") then
     return configure()
   else
-    --local response = http_request({endpoint="/ac.cgi", resp_match = "opmode"})
     local response = http_request({endpoint="/ac.cgi", resp_match = "opmode"})
     return parse_body(response, g_status)
   end
@@ -650,6 +688,11 @@ local function set_point(device, new_current_setpoint)
   return parse_body(response, g_status)
 end
 ----------------------------------------------------------------------------------------------
+local function get_point(device, new_current_setpoint)
+  local current_set_point = luup.variable_get(HVACSET_SID, "CurrentSetpoint", skyfi_device) or ""
+  return current_set_point
+end
+----------------------------------------------------------------------------------------------
 local function concat_table()
   local str=""
   for k, v in pairs(g_param) do
@@ -682,55 +725,83 @@ end
 ----------------------------------------------------------------------------------------------
 function configure()
   log("Configuring plugin ...")
-  
-  local config1_temp = 1
-  local config2_temp = 1
-  
-  local config = luup.variable_get(HADEVICE_SID,"Configured", skyfi_device) or ""
-  if (config == "") then
-    luup.variable_set(HADEVICE_SID,"Configured", 0 ,skyfi_device)
-  end
-  config = tonumber(config,10)
 
-  if(config == 0 or config == -2) then
+  local status = luup.variable_get(SWP_SID, SWP_STATUS, skyfi_device) or ""
+  if status == "" then
+    luup.variable_set(SWP_SID, SWP_STATUS, 0, skyfi_device)
+  end
+  configuration_update(2,{p=status})
+
+  local current_set_point = luup.variable_get(HVACSET_SID, "CurrentSetpoint", skyfi_device) or ""
+  if current_set_point == "" then
+    current_set_point = DEFAULT_SETPOINT
+    luup.variable_set(HVACSET_SID, "CurrentSetpoint", current_set_point, skyfi_device)
+  end
+  current_set_point = string.format("%.6f", current_set_point, 10)
+  configuration_update(3,{t=current_set_point})
+
+  local fan_speed_status = luup.variable_get(FAN_SID, "FanSpeedStatus", skyfi_device) or ""
+  local mode = luup.variable_get(HVACF_SID, "Mode", skyfi_device) or ""
+  if fan_speed_status == "" then
+    luup.variable_set(FAN_SID, "FanSpeedStatus", 0, skyfi_device)
+  end
+  if mode == "" then
+    luup.variable_set(HVACF_SID, "Mode", 0, skyfi_device)
+  end
+  g_param["fanflags"] =  tonumber(fan_speed_status)
+  fan_configuration_update ()
+
+  local mode_status = luup.variable_get(HVACO_SID, "ModeStatus", skyfi_device) or ""
+  if mode_status == "" then
+    luup.variable_set(HVACO_SID, "ModeStatus", "Off", skyfi_device)
+  end
+  configuration_update(5,{m=0})
+
+  local louvre = luup.variable_get(SKYFI_SID, "Louvre", skyfi_device) or ""
+  if louvre == "" then
+    luup.variable_set(SKYFI_SID, "Louvre", 0, skyfi_device)
+  end
+  configuration_update(6,{lv = louvre})
+  
+  local ident_configured = luup.variable_get(SKYFI_SID,"IdentConfigured", skyfi_device) or ""
+  if (ident_configured == "") then
+    luup.variable_set(SKYFI_SID,"IdentConfigured", 0 ,skyfi_device)
+  end
+  ident_configured = tonumber(ident_configured,10)
+
+  local zone_configured = luup.variable_get(SKYFI_SID,"ZoneConfigured", skyfi_device) or ""
+  if (zone_configured == "") then
+    luup.variable_set(SKYFI_SID,"ZoneConfigured", 0 ,skyfi_device)
+  end
+  zone_configured = tonumber(zone_configured,10)
+
+  if(ident_configured ~= 1) then
     debug("Configuring unit identity ...")
+    luup.variable_set(SKYFI_SID, "IdentConfigured", -2 ,skyfi_device)
     if(get_identity() == true) then
+      luup.variable_set(SKYFI_SID, "IdentConfigured", 1 ,skyfi_device)
       luup.variable_set(SKYFI_SID,"Parameters", concat_table() or "", skyfi_device)
-      config1_temp = 1
-    else
-      config1_temp = -1
     end
   end
-  debug("Temporary device id setting:" .. config1_temp .. " type:" .. type(config1_temp))
-  
   local zone_controller = luup.variable_get(SKYFI_SID,  "zc", skyfi_device) or ""
-  if(config == 0 or config == -1) then
+
+  if(zone_configured ~= 1) then
     debug("Configuring zone controller ...")
     if(tonumber(zone_controller,10) == 1) then
-      if (get_zones() == true) then
-        config2_temp = 1
-      else
-        config2_temp = -1
+      luup.variable_set(SKYFI_SID,"ZoneConfigured", -2 ,skyfi_device)
+      if (get_zones() == true) then 
+        luup.variable_set(SKYFI_SID,"ZoneConfigured", 1 ,skyfi_device)
       end
-    else
-      debug("No zones associated with HVAC device " .. skyfi_device .. ".")
-      config2_temp = 1
+    end
+    --luup.variable_set(SKYFI_SID,"ZoneConfigured", 1 ,skyfi_device)
+  end
+
+  debug("Getting controller status ...")
+  if(zone_configured == 1 and ident_configured == 1) then
+    if (get_status() == true) then 
+      luup.variable_set(HADEVICE_SID,"Configured", 1, skyfi_device)
     end
   end
-  debug("Temporary zone configuration setting:" .. config2_temp .. " type:" .. type(config2_temp))
-  
-  debug("Setting controller configuration status ...")
-  if(config1_temp == 1 and config2_temp == 1) then
-    config = 1
-    elseif (config1_temp == 1 and config2_temp == -1) then
-    config = -1
-  elseif (config1_temp == -1 and config2_temp == 1) then
-    config = -2
-  else
-    config = 0
-  end
-    
-  luup.variable_set(HADEVICE_SID,"Configured", config, skyfi_device)
 
   return true
 end
@@ -761,62 +832,18 @@ function daikin_sky_startup(lul_device)
   
   if (ip == "") then
     local ip_address, port = auto_config()
-    
     if(ip_address) then
-      debug("daikin_sky_startup:IPAddress: " .. ip_address .. ":Port: " .. port .. ".")
-      debug("daikin_sky_startup:Setting IP address in memory")
       luup.attr_set('ip', ip_address , skyfi_device)
     else
       return false, "Cannot auto configure, please try entering IP address and port.", "Daikin SKYFi"
     end
-    
   else
-    
     luup.set_failure(false, skyfi_device)
-    local status = luup.variable_get(SWP_SID, SWP_STATUS, skyfi_device) or ""
-    
-    if status == "" then
-      luup.variable_set(SWP_SID, SWP_STATUS, 0, skyfi_device)
-    end
-    configuration_update(2,{p=status})
-    
-    local current_set_point = luup.variable_get(HVACSET_SID, "CurrentSetpoint", skyfi_device) or ""
-    
-    if current_set_point == "" then
-      current_set_point = DEFAULT_SETPOINT
-      luup.variable_set(HVACSET_SID, "CurrentSetpoint", current_set_point, skyfi_device)
-    end
-    current_set_point = string.format("%.6f", current_set_point, 10)
-    configuration_update(3,{t=current_set_point})
+    luup.call_delay("configure", 5, "")
+    luup.call_delay("ac_update", 10, "")
+    luup.call_delay("registerWithAltUI", 15, "")
 
-    local fan_speed_status = luup.variable_get(FAN_SID, "FanSpeedStatus", skyfi_device) or ""
-    local mode = luup.variable_get(HVACF_SID, "Mode", skyfi_device) or ""
-    if fan_speed_status == "" then
-      luup.variable_set(FAN_SID, "FanSpeedStatus", 0, skyfi_device)
-    end
-    
-    if mode == "" then
-      luup.variable_set(HVACF_SID, "Mode", 0, skyfi_device)
-    end
-    g_param["fanflags"] =  tonumber(fan_speed_status)
-    fan_configuration_update ()
-
-    local mode_status = luup.variable_get(HVACO_SID, "ModeStatus", skyfi_device) or ""
-    if mode_status == "" then
-      luup.variable_set(HVACO_SID, "ModeStatus", "Off", skyfi_device)
-    end
-    configuration_update(5,{m=0})
-
-    local louvre = luup.variable_get(SKYFI_SID, "Louvre", skyfi_device) or ""
-    if louvre == "" then
-      luup.variable_set(SKYFI_SID, "Louvre", 0, skyfi_device)
-    end
-    
-    configuration_update(6,{lv = louvre})
   end
-  
-  luup.call_delay("configure", 15, "")
-  luup.call_delay("ac_update", 30, "")
 
   log("SkyFi Plugin Startup SUCCESS: Startup successful.")
   return true, "Startup successful.", "Daikin SkyFi"

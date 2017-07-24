@@ -1,0 +1,246 @@
+{
+	"default_icon": "damper.png",
+	"state_icons": [
+		{
+			"img": "damper_0.png",
+			"conditions": [
+				{
+					"service": "urn:upnp-org:serviceId:SwitchPower1",
+					"variable": "Status",
+					"operator": "==",
+					"value": 0
+				}
+			]
+		},
+		{
+			"img": "damper_100.png",
+			"conditions": [
+				{
+					"service": "urn:upnp-org:serviceId:SwitchPower1",
+					"variable": "Status",
+					"operator": "==",
+					"value": 1
+				}
+			]
+		},
+	],
+	"x": "2",
+	"y": "4",
+	"inScene": "1",
+	"ToggleButton": 1,
+	"Tabs": [
+		{
+			"Label": {
+				"lang_tag": "ui7_tabname_control",
+				"text": "Control"
+			},
+			"Position": "0",
+			"TabType": "flash",
+			"top_navigation_tab": 1,
+			"ControlGroup": [
+				{
+					"id": "1",
+					"isSingle": "1",
+					"scenegroup": "1"
+				}
+			],
+			"SceneGroup": [
+				{
+					"id": "1",
+					"top": "2",
+					"left": "0",
+					"x": "2",
+					"y": "1"
+				}
+			],
+			"Control": [
+				{
+					"ControlGroup": "1",
+					"ControlType": "multi_state_button",
+					"top": "0",
+					"left": "1",
+					"states":[
+						{
+							"Label": {
+								"lang_tag": "ui7_cmd_on",
+								"text": "Open"
+							},
+							"ControlGroup": "1",
+							"Display": {
+								"Service": "urn:upnp-org:serviceId:SwitchPower1",
+								"Variable": "Status",
+								"Value": "1"
+							},
+							"Command": {
+								"Service": "urn:upnp-org:serviceId:SwitchPower1",
+								"Action": "SetTarget",
+								"Parameters": [
+									{
+										"Name": "newTargetValue",
+										"Value": "1"
+									}
+								]
+							},
+							"ControlCode": "damper_open"
+						},
+						{
+							"Label": {
+								"lang_tag": "ui7_cmd_off",
+								"text": "Closed"
+							},
+							"ControlGroup": "1",
+							"Display": {
+								"Service": "urn:upnp-org:serviceId:SwitchPower1",
+								"Variable": "Status",
+								"Value": "0"
+							},
+							"Command": {
+								"Service": "urn:upnp-org:serviceId:SwitchPower1",
+								"Action": "SetTarget",
+								"Parameters": [
+									{
+										"Name": "newTargetValue",
+										"Value": "0"
+									}
+								]
+							},
+							"ControlCode": "damper_closed"
+						}
+					]
+				}
+			]
+		},
+		{
+			"Label": {
+				"lang_tag": "ui7_settings",
+				"text": "Settings"
+			},
+			"Position": "1",
+			"TabType": "javascript",
+			"ScriptName": "shared.js",
+			"Function": "simple_device"
+		},
+		{
+			"Label": {
+				"lang_tag": "ui7_advanced",
+				"text": "Advanced"
+			},
+			"Position": "2",
+			"TabType": "javascript",
+			"ScriptName": "shared.js",
+			"Function": "advanced_device"
+		},
+		{
+			"Label": {
+				"lang_tag": "ui7_device_options",
+				"text": "Device Options"
+			},
+			"Position": "3",
+			"TabType": "javascript",
+			"ScriptName": "shared.js",
+			"Function": "device_zwave_options"
+		},
+		{
+			"Label": {
+				"lang_tag": "ui7_logs",
+				"text": "Logs"
+			},
+			"Position": "4",
+			"TabType": "javascript",
+			"ScriptName": "shared.js",
+			"Function": "device_logs"
+		},
+		{
+			"Label": {
+				"lang_tag": "ui7_notifications",
+				"text": "Notifications"
+			},
+			"Position": "5",
+			"TabType": "javascript",
+			"ScriptName": "shared.js",
+			"Function": "device_notifications"
+		},
+		{
+			"Label": {
+				"lang_tag": "ui7_device_scenes",
+				"text": "Scenes"
+			},
+			"Position": "6",
+			"TabType": "javascript",
+			"ScriptName": "shared.js",
+			"Function": "device_scenes"
+		}
+	],
+	"sceneList": {
+		"group_1": {
+			"cmd_1": {
+				"label": "ON",
+				"serviceId": "urn:upnp-org:serviceId:SwitchPower1",
+				"action": "SetTarget",
+				"arguments": {
+					"newTargetValue": "1"
+				},
+				"display": {
+					"service": "urn:upnp-org:serviceId:SwitchPower1",
+					"variable": "Status",
+					"value": "1"
+				}
+			},
+			"cmd_2": {
+				"label": "OFF",
+				"serviceId": "urn:upnp-org:serviceId:SwitchPower1",
+				"action": "SetTarget",
+				"arguments": {
+					"newTargetValue": "0"
+				},
+				"display": {
+					"service": "urn:upnp-org:serviceId:SwitchPower1",
+					"variable": "Status",
+					"value": "0"
+				}
+			}
+		}
+	},
+	"eventList2": [
+		{
+			"id": 1,
+			"label": {
+				"lang_tag": "ui7_a_device_is_turned_on_off",
+				"text": "A device is turned on or off"
+			},
+			"serviceId": "urn:upnp-org:serviceId:SwitchPower1",
+			"argumentList": [
+				{
+					"id": 1,
+					"dataType": "boolean",
+					"defaultValue": "1",
+					"allowedValueList": [
+						{
+							"Off": "0",
+							"HumanFriendlyText": {
+								"lang_tag": "ui7_hft_device_turned_off",
+								"text": "Whenever the _DEVICE_NAME_ is turned off"
+							}
+						},
+						{
+							"On": "1",
+							"HumanFriendlyText": {
+								"lang_tag": "ui7_hft_device_turned_on",
+								"text": "Whenever the _DEVICE_NAME_ is turned on"
+							}
+						}
+					],
+					"name": "Status",
+					"comparisson": "=",
+					"prefix": {
+						"lang_tag": "ui7_which_mode",
+						"text": "Which mode"
+					},
+					"suffix": {}
+				}
+			]
+		}
+	],
+    "DeviceType": "urn:zoot-com:device:Damper:1",
+    "device_type": "urn:zoot-com:device:Damper:1"
+}

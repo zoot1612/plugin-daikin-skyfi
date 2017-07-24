@@ -27,6 +27,11 @@
       <run>set_point(lul_device, lul_settings.NewCurrentSetpoint)</run>
     </action>
     <action>
+      <serviceId>urn:upnp-org:serviceId:TemperatureSetpoint1</serviceId>
+      <name>GetCurrentSetpoint</name>
+      <run>get_point(lul_device)</run>
+    </action>
+    <action>
       <serviceId>urn:upnp-org:serviceId:SwitchPower1</serviceId>
       <name>SetTarget</name>
       <run>set_target(lul_device, lul_settings.newTargetValue)</run>
