@@ -853,8 +853,6 @@ function daikin_sky_startup(lul_device)
   return true, "Startup successful.", "Daikin SkyFi"
 end
 
--- Information only as I am not sure of the error codes --
---[[
 d_err_cat = {
 	["1"] =	"Indoor Unit",
 	["2"] =	"Outdoor Unit ",
@@ -1020,6 +1018,3 @@ d_err = {
 	["349"] =	{error  =  "MC",  cat = "3",  desc = "Centralized remote controller address setting error."},
 	["65535"] =	{error  =  "N/A",  cat = "4",  desc = " Comunication error with the A.C."}
 }
-
-"Error code not listed, contact your nearest Daikin technical support service."
-]]---
