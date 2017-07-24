@@ -5,7 +5,7 @@ http.TIMEOUT = 10
 
 local DEBUG_MODE = 1
 local RETRY = 15
-local VERSION = "0.16"
+local VERSION = "0.17"
 
 local skyfi_device = nil
 
@@ -552,7 +552,7 @@ local g_status = {
       local err_cat
       if (etable and etable) then
         err_desc = etable.desc
-        err_cat = etable.cat or 'no catagory'
+        err_cat = d_err_cat[etable.cat] or 'no catagory'
         debug(self.description .. ": " .. "Alarm catagory: " .. err_cat  .. ". Description:" .. etable.desc .. ".")
       elseif (value == '0') then
         debug(self.description .. ": " .. "No air conditioning alarms")
